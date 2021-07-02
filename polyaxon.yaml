@@ -1,0 +1,70 @@
+---
+version: 1
+
+kind: group
+
+framework: pytorch
+
+tags: [mixmatch]
+
+build:
+  image: pytorch/pytorch:1.4-cuda10.1-cudnn7-runtime
+  build_steps:
+    - apt-get update -y
+    - apt-get install -y libglib2.0-dev libsm6 libxext6 libxrender-dev
+    - pip install -r requirements.txt
+
+environment:
+  resources:
+    cpu:
+      requests: 4
+      limits: 4
+    memory:
+      requests: 4096
+      limits: 15360
+    gpu:
+      requests: 1
+      limits: 1
+
+
+declarations:
+  model: 'wide_resnet28_2' # or other models
+  dataset: 'cifar10' # or other datasets
+  lr: 0.03
+  wd: 0.0005
+  num_labeled: 250
+  iters_per_epoch: 1024
+  batch_size: 64
+  epochs: 1024
+  device: 'cuda'
+  out_dir: 'fixmatch_al'
+  m: 30
+  threshold: 0.95
+  beta: 0.9
+  num_augmentations: 2
+  mu: 7
+  wu: 1
+
+
+run:
+  cmd: python -u main.py
+    --device={{ device }} \
+    --dataset={{ dataset }} \
+    --out-dir={{ out_dir }} \
+    --batch-size={{ batch_size }}
+    --epochs={{ epochs }} \
+    --iters-per-epoch={{ iters_per_epoch }} \
+    --model={{ model }} \
+    --lr={{ lr }} \
+    --wd={{ wd }} \
+    --num-labeled={{ num_labeled }} \
+    --mu={{ mu }} \
+    --temperature={{ temperature }} \
+    --num-augmentations={{ num_augmentations }} \
+    --wu={{ wu }} \
+    --alpha={{ alpha }} \
+    --seed={{ seed }} \
+    --polyaxon \
+    --save \
+    --use-ema
+
