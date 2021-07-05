@@ -259,7 +259,21 @@ def set_grads(model: torch.nn.Module, trainable_layers: List[str]):
             p.requires_grad = True
 
 
-def get_wd_param_list(model):
+def get_wd_param_list(model: torch.nn.Module):
+    """
+    Get list of model parameters to which weight decay should be applied. The function basically filters out
+    all BatchNorm-related parameters to which weight decay should not be applied.
+
+    Parameters
+    ----------
+    model: torch.nn.Module
+        torch model which is trained using weight decay.
+    Returns
+    -------
+    wd_param_list: List
+        List containing two dictionaries containing parameters for which weight decay should be applied and parameters
+        to which weight decay should not be applied.
+    """
     wd_params, no_wd_params = [], []
     for name, param in model.named_parameters():
         # Filter BatchNorm parameters from weight decay parameters

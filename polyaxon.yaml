@@ -5,7 +5,7 @@ kind: group
 
 framework: pytorch
 
-tags: [mixmatch]
+tags: [fixmatch]
 
 build:
   image: pytorch/pytorch:1.4-cuda10.1-cudnn7-runtime

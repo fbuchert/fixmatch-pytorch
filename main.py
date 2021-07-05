@@ -64,7 +64,7 @@ def main(args, save_path: str):
     )
 
     # Print and log dataset stats
-    logger.info("-------- Starting Semi-Supervised Model Training --------")
+    logger.info("-------- Starting FixMatch Model Training --------")
     logger.info("\t- Labeled train set: {}".format(len(train_sets["labeled"])))
     logger.info("\t- Unlabeled train set: {}".format(len(train_sets["unlabeled"])))
     logger.info("\t- Validation set: {}".format(len(validation_set)))

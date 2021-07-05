@@ -10,7 +10,7 @@ def parse_args():
     argparse.Namespace
         Namespace that contains all command line arguments with their corresponding values
     """
-    parser = argparse.ArgumentParser(description="Training")
+    parser = argparse.ArgumentParser(description="FixMatch training")
 
     # General arguments
     parser.add_argument(
