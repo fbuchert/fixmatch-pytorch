@@ -59,14 +59,14 @@ def apply_wd(model: torch.nn.Module, wd: float, param_names: List = ["conv", "fc
 
     Parameters
     ----------
-    wd_tuple: Tuple
-        Tuple which contains the phrases which are checked for, e.g. (`conv`, `weight`) or (`fc`, `weight`)
-    name: str
-        Name of parameter as saved in state dict, e.g. `conv1.weight`
-    Returns
-    ----------
-    wd_check: bool
-        Returns a bool indicating whether all strings in wd_tuple are contained in name.
+    model: torch.nn.Module
+        Model to which weight decay is applied
+    wd: float
+        Float specifying weight decay. Parameters are updated to: param = (1-wd) * param
+    param_names: List (default: ["conv", "fc"])
+        Parameter names (or substring of names) for which the weight decay is applied.
+    types: List (default: ["weight"])
+        Parameter types for which weight decay is applied.
     """
     with torch.no_grad():
         for name, param in model.state_dict().items():

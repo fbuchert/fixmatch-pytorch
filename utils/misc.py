@@ -85,6 +85,10 @@ def save_state(
         path: str,
         filename: str = "best_model.tar",
 ):
+    old_checkpoint_files = list(
+        filter(lambda x: "checkpoint" in x, os.listdir(path))
+    )
+
     state_dict = {
         "epoch": epoch,
         "model_state_dict": model.state_dict(),
@@ -96,6 +100,9 @@ def save_state(
     file_path = os.path.join(path, filename)
     logger.info("Save current state to {}".format(filename))
     torch.save(state_dict, file_path)
+
+    for file in old_checkpoint_files:
+        os.remove(os.path.join(path, file))
 
 
 def load_dataset_indices(load_path: str, file_name: str = "indices.json"):

@@ -65,7 +65,7 @@ class NetworkBlock(nn.Module):
             activate_before_residual=False,
     ):
         super(NetworkBlock, self).__init__()
-        self.layer = self._make_layer(
+        self.layer = NetworkBlock._make_layer(
             block,
             in_planes,
             out_planes,
@@ -75,8 +75,8 @@ class NetworkBlock(nn.Module):
             activate_before_residual,
         )
 
+    @staticmethod
     def _make_layer(
-            self,
             block,
             in_planes,
             out_planes,
@@ -105,19 +105,19 @@ class NetworkBlock(nn.Module):
 class WideResNet(nn.Module):
     def __init__(self, depth, num_classes, widen_factor=1, dropout_rate=0.0):
         super(WideResNet, self).__init__()
-        nChannels = [16, 16 * widen_factor, 32 * widen_factor, 64 * widen_factor]
+        n_channels = [16, 16 * widen_factor, 32 * widen_factor, 64 * widen_factor]
         assert (depth - 4) % 6 == 0
         n = (depth - 4) / 6
         block = BasicBlock
         # 1st conv before any network block
         self.conv1 = nn.Conv2d(
-            3, nChannels[0], kernel_size=3, stride=1, padding=1, bias=True
+            3, n_channels[0], kernel_size=3, stride=1, padding=1, bias=True
         )
         # 1st block
         self.block1 = NetworkBlock(
             n,
-            nChannels[0],
-            nChannels[1],
+            n_channels[0],
+            n_channels[1],
             block,
             1,
             dropout_rate,
@@ -125,18 +125,18 @@ class WideResNet(nn.Module):
         )
         # 2nd block
         self.block2 = NetworkBlock(
-            n, nChannels[1], nChannels[2], block, 2, dropout_rate
+            n, n_channels[1], n_channels[2], block, 2, dropout_rate
         )
         # 3rd block
         self.block3 = NetworkBlock(
-            n, nChannels[2], nChannels[3], block, 2, dropout_rate
+            n, n_channels[2], n_channels[3], block, 2, dropout_rate
         )
         # global average pooling and classifier
-        self.bn1 = nn.BatchNorm2d(nChannels[3], momentum=0.001)
+        self.bn1 = nn.BatchNorm2d(n_channels[3], momentum=0.001)
         self.relu = nn.LeakyReLU(negative_slope=0.1, inplace=True)
         self.avgpool = nn.AvgPool2d(8)
-        self.fc = nn.Linear(nChannels[3], num_classes)
-        self.nChannels = nChannels[3]
+        self.fc = nn.Linear(n_channels[3], num_classes)
+        self.nChannels = n_channels[3]
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
