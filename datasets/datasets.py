@@ -173,7 +173,7 @@ def get_uniform_split(targets: List, indices: List, split_pct: float = None, spl
     """
     Method that splits provided train_indices uniformly according to targets / class labels, i.e. it returns a random
     split of train_indices s.t. indices in both splits are ideally uniformly distributed among classes (as done
-    in MixMatch implementation by default).
+    in FixMatch implementation by default).
 
     Parameters
     ----------

@@ -147,12 +147,12 @@ def get_normalizer(dataset: str):
 def get_weak_augmentation(img_size: int = 32, padding: int = 4, padding_mode: str = "reflect"):
     """
     Get weak torch augmentation strategy comprised of a random crop and random horizontal flips.
-    This is the default augmentation strategy used in MixMatch, which randomly crops 12.5% of input images.
+    This is the default weak augmentation strategy used in FixMatch, which randomly crops 12.5% of input images.
 
     Parameters
     ----------
     img_size:
-        Desired size of output images, which is used as input to the RandomCrop function. In MixMatch size of input
+        Desired size of output images, which is used as input to the RandomCrop function. In FixMatch size of input
         and output images of the weak augmentation strategy should be equal.
     padding: int
         Number of padding pixels at added to the border of the image before cropping.

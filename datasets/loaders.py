@@ -114,7 +114,7 @@ def create_loaders(
     test_dataset: Dataset,
     batch_size: int,
     num_workers: int = 0,
-    mu: int = 1,
+    mu: int = 7,
     total_iters: int = None,
 ) -> (DataLoader, DataLoader, DataLoader):
     """
@@ -136,14 +136,14 @@ def create_loaders(
         size used for labeled train loader for the unlabeled train loader.
     num_workers: int (default: 0)
         Number of subprocesses used for data loading. If num_workers=0, data loading is executed in the main process.
-    mu: int (default: 1)
-        Multiplication factor which is used to compute the batch_size for the unlabeled train dataset. In MixMatch
+    mu: int (default: 7)
+        Multiplication factor which is used to compute the batch_size for the unlabeled train dataset. In Fixmatch
         this factor is set to 1, i.e. at every iteration the same number of samples is loaded from the labeled and
         the unlabeled train datasets. In FixMatch this factor is set to 7.
     total_iters: int (default: None)
         total_iters specifies the total number of desired training iterations per epoch. If not None,
         the product of total_iters and batch_size is used to compute the total number of samples used for training
-        at every epoch. Note: This is required as MixMatch deviates from the conventional definition of `epoch`,
+        at every epoch. Note: This is required as FixMatch deviates from the conventional definition of `epoch`,
         i.e. it trains for 1024 iterations per epoch passing through a dataset such as CIFAR-10 multiple times.
     Returns
     ----------

@@ -20,7 +20,7 @@ logger = logging.getLogger()
 
 def main(args, save_path: str):
     """
-    Main function that sets up and starts the MixMatch training
+    Main function that sets up and starts the FixMatch training
     """
     writer = SummaryWriter(save_path)
 

@@ -360,7 +360,7 @@ def train_epoch(
     model: torch.nn.Module
         Model, i.e. neural network to train using FixMatch.
     ema_model: EMA
-        The EMA class which maintains an exponential moving average of model parameters. In MixMatch the exponential
+        The EMA class which maintains an exponential moving average of model parameters. In FixMatch the exponential
         moving average parameters are used for model evaluation and for the reported results.
     train_loader_labeled: DataLoader
         Data loader fetching batches from the labeled set of data.
@@ -422,7 +422,7 @@ def train_epoch(
 
 def train_step(args: argparse.Namespace, model: torch.nn.Module, batch: Tuple, meters: AverageMeterSet):
     """
-    Method that executes a MixMatch training step, i.e. a single training iteration.
+    Method that executes a FixMatch training step, i.e. a single training iteration.
 
     Parameters
     ----------
