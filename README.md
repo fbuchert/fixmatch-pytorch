@@ -32,7 +32,7 @@ All commandline arguments, which can be used to adapt the configuration of FixMa
 
 Alternatively, the `polyaxon.yaml`-file can be used to start FixMatch training on a polyaxon-cluster:
 ```
-polyaxon run -f polyaxon_runs/mixmatch_runs/al_cifar10.yaml -u
+polyaxon run -f polyaxon.yaml -u
 ```
 For a general introduction to polyaxon and its commandline client, please refer to the [official documentation](https://github.com/polyaxon/polyaxon) 
 ## Monitoring
