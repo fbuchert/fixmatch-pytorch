@@ -20,7 +20,7 @@ from augmentation.randaugment import RandAugment
 from augmentation.augmentations import get_weak_augmentation, cutout, get_normalizer
 from eval import evaluate
 from datasets.config import IMG_SIZE
-from utils.train import EMA, ModelWrapper, cosine_lr_decay, get_wd_param_list
+from utils.train import EMA, cosine_lr_decay, get_wd_param_list
 from utils.eval import AverageMeterSet
 from utils.metrics import write_metrics
 from utils.misc import save_state, load_state
@@ -235,7 +235,7 @@ def train(
     train_loader_unlabeled: DataLoader
         Data loader of unlabeled dataset
     validation_loader: DataLoader
-        Data loader of validation set (by default FixMatch does not use a validation dataset)
+        Data loader of validation set (usually empty as by default FixMatch does not use a validation dataset)
     test_loader: DataLoader
         Data loader of test set
     writer: SummaryWriter
@@ -264,7 +264,6 @@ def train(
     optimizer = get_optimizer(args, model)
     scheduler = get_scheduler(args, optimizer)
 
-    best_acc = 0
     start_epoch = 0
 
     if args.resume:
@@ -274,7 +273,6 @@ def train(
             ema_model.shadow = state_dict["ema_model_shadow"]
         optimizer.load_state_dict(state_dict["optimizer"])
         scheduler.load_state_dict(state_dict["scheduler"])
-        best_acc = state_dict["acc"]
         start_epoch = state_dict["epoch"]
 
     for epoch in range(start_epoch, args.epochs):

@@ -8,83 +8,6 @@ import torch.nn as nn
 import torch.nn.init as init
 
 
-def model_init(m: torch.nn.Module):
-    """
-    Method that initializes torch modules depending on their type:
-        - Convolutional Layers: Xavier Uniform Initialization
-        - BatchNorm Layers: Standard initialization
-        - Fully connected / linear layers: Xavier Normal Initialization#
-
-    Parameters
-    ----------
-    m: torch.nn.Module
-        Torch module which to be initialized. The specific initialization used depends on the type of module.
-    """
-    classname = m.__class__.__name__
-    if classname.find("Conv") != -1:
-        init.xavier_uniform_(m.weight, gain=math.sqrt(2))
-        if m.bias is not None:
-            init.constant_(m.bias, 0)
-    elif classname.find("BatchNorm") != -1:
-        init.constant_(m.weight, 1)
-        init.constant_(m.bias, 0)
-    elif classname.find("Linear") != -1:
-        init.xavier_normal_(m.weight, gain=math.sqrt(2))
-        if m.bias is not None:
-            init.constant_(m.bias, 0)
-
-
-def wd_check(wd_tuple: Tuple, name: str):
-    """
-    Method that checks if parameter name matches the key words in wd_tuple. This check is used to filter certain
-    types of parameters independent of the layer, which it belongs to, e.g. `conv1.weight`.
-
-    Parameters
-    ----------
-    wd_tuple: Tuple
-        Tuple which contains the phrases which are checked for, e.g. (`conv`, `weight`) or (`fc`, `weight`)
-    name: str
-        Name of parameter as saved in state dict, e.g. `conv1.weight`
-    Returns
-    ----------
-    wd_check: bool
-        Returns a bool indicating whether all strings in wd_tuple are contained in name.
-    """
-    return all([x in name for x in wd_tuple])
-
-
-def apply_wd(model: torch.nn.Module, wd: float, param_names: List = ["conv", "fc"], types: List = ["weight"]):
-    """
-    Method that manually applies weight decay to model parameters that match the specified parameter names and types.
-
-    Parameters
-    ----------
-    model: torch.nn.Module
-        Model to which weight decay is applied
-    wd: float
-        Float specifying weight decay. Parameters are updated to: param = (1-wd) * param
-    param_names: List (default: ["conv", "fc"])
-        Parameter names (or substring of names) for which the weight decay is applied.
-    types: List (default: ["weight"])
-        Parameter types for which weight decay is applied.
-    """
-    with torch.no_grad():
-        for name, param in model.state_dict().items():
-            if any(
-                    [wd_check(wd_tuple, name) for wd_tuple in product(param_names, types)]
-            ):
-                param.mul_(1 - wd)
-
-
-def set_bn_running_updates(model, enable: bool, bn_momentum: float = 0.001):
-    """
-    Method that enables or disables updates of the running batch norm vars by setting the momentum parameter to 0
-    """
-    for m in model.modules():
-        if isinstance(m, nn.BatchNorm2d):
-            m.momentum = bn_momentum if enable else 0.0
-
-
 class EMA:
     """
     Class that keeps track of exponential moving average of model parameters of a particular model.
@@ -221,6 +144,83 @@ class ModelWrapper:
     def get_embedding_dim(self):
         last_layer = list(self.task_model.modules())[-1]
         return last_layer.in_features
+
+
+def model_init(m: torch.nn.Module):
+    """
+    Method that initializes torch modules depending on their type:
+        - Convolutional Layers: Xavier Uniform Initialization
+        - BatchNorm Layers: Standard initialization
+        - Fully connected / linear layers: Xavier Normal Initialization#
+
+    Parameters
+    ----------
+    m: torch.nn.Module
+        Torch module which to be initialized. The specific initialization used depends on the type of module.
+    """
+    classname = m.__class__.__name__
+    if classname.find("Conv") != -1:
+        init.xavier_uniform_(m.weight, gain=math.sqrt(2))
+        if m.bias is not None:
+            init.constant_(m.bias, 0)
+    elif classname.find("BatchNorm") != -1:
+        init.constant_(m.weight, 1)
+        init.constant_(m.bias, 0)
+    elif classname.find("Linear") != -1:
+        init.xavier_normal_(m.weight, gain=math.sqrt(2))
+        if m.bias is not None:
+            init.constant_(m.bias, 0)
+
+
+def wd_check(wd_tuple: Tuple, name: str):
+    """
+    Method that checks if parameter name matches the key words in wd_tuple. This check is used to filter certain
+    types of parameters independent of the layer, which it belongs to, e.g. `conv1.weight`.
+
+    Parameters
+    ----------
+    wd_tuple: Tuple
+        Tuple which contains the phrases which are checked for, e.g. (`conv`, `weight`) or (`fc`, `weight`)
+    name: str
+        Name of parameter as saved in state dict, e.g. `conv1.weight`
+    Returns
+    ----------
+    wd_check: bool
+        Returns a bool indicating whether all strings in wd_tuple are contained in name.
+    """
+    return all([x in name for x in wd_tuple])
+
+
+def apply_wd(model: torch.nn.Module, wd: float, param_names: List = ["conv", "fc"], types: List = ["weight"]):
+    """
+    Method that manually applies weight decay to model parameters that match the specified parameter names and types.
+
+    Parameters
+    ----------
+    model: torch.nn.Module
+        Model to which weight decay is applied
+    wd: float
+        Float specifying weight decay. Parameters are updated to: param = (1-wd) * param
+    param_names: List (default: ["conv", "fc"])
+        Parameter names (or substring of names) for which the weight decay is applied.
+    types: List (default: ["weight"])
+        Parameter types for which weight decay is applied.
+    """
+    with torch.no_grad():
+        for name, param in model.state_dict().items():
+            if any(
+                    [wd_check(wd_tuple, name) for wd_tuple in product(param_names, types)]
+            ):
+                param.mul_(1 - wd)
+
+
+def set_bn_running_updates(model, enable: bool, bn_momentum: float = 0.001):
+    """
+    Method that enables or disables updates of the running batch norm vars by setting the momentum parameter to 0
+    """
+    for m in model.modules():
+        if isinstance(m, nn.BatchNorm2d):
+            m.momentum = bn_momentum if enable else 0.0
 
 
 def cosine_lr_decay(k: int, total_steps: int):
