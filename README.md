@@ -1,4 +1,4 @@
-# FixMatch
+# PyTorch Implementation: FixMatch
 PyTorch implementation of [FixMatch: Simplifying Semi-Supervised Learning with Consistency and Confidence
 ](https://arxiv.org/abs/2001.07685) based on the [official tensorflow implementation](https://github.com/google-research/fixmatch).
 
@@ -9,7 +9,6 @@ The implementation supports the following datasets:
 - STL10
 - HAM10000
 - ImageNet
-
 
 
 ## Installation
@@ -28,7 +27,32 @@ FixMatch training is started by running the following command:
 python main.py
 ```
 All commandline arguments, which can be used to adapt the configuration of FixMatch are defined and described in `arguments.py`.
-
+By default the following configuration is run:
+```
+model: 'wide_resnet28_2'
+dataset: 'cifar10'
+lr: 0.03
+wd: 0.0005
+num_labeled: 250 (number of labeled samples, i.e. 25 labeled samples per class for cifar10)
+iters_per_epoch: 1024
+batch_size: 64
+epochs: 1024
+device: 'cuda'
+out_dir: 'fixmatch'
+m: 30
+threshold: 0.95
+beta: 0.9
+num_augmentations: 2
+mu: 7
+wu: 1
+```
+In addition to these, the following arguments can be used to further configure the FixMatch training process:
+* `--device <cuda / cpu>`: Specify whether training should be run on GPU (if available) or CPU
+* `--num-workers <num_workers>`: Number of workers used by torch dataloader
+* `--resume <path to run_folder>`: Resumes training of training run saved at specified path, e.g. `'out/mixmatch_training/run_0'`. Dataset splits, model state, optimizer state, etc.
+  are loaded and training is resumed with specified arguments.
+* see `arguments.py` for more
+  
 
 Alternatively, the `polyaxon.yaml`-file can be used to start FixMatch training on a polyaxon-cluster:
 ```
