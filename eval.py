@@ -1,4 +1,5 @@
 import logging
+import argparse
 from tqdm import tqdm
 
 import torch
@@ -111,3 +112,58 @@ def evaluate(
         f1_weighted=f1(pred_labels.cpu(), true_labels.cpu(), average="weighted"),
     )
     return eval_tuple
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='FixMatch evaluation')
+
+    parser.add_argument('--run-path', type=str, help='path to FixMatch run which should be evaluated.')
+    parser.add_argument('--data-dir', default='./data', type=str, help='path to directory where datasets are saved.')
+    parser.add_argument('--checkpoint-file', default='', type=str, help='name of .tar-checkpoint file from which model is loaded for evaluation.')
+    parser.add_argument('--device', default='cpu', type=str, choices=['cpu', 'gpu'], help='device (cpu / cuda) on which evaluation is run.')
+    parser.add_argument('--pbar', action='store_true', default=False, help='flag indicating whether or not to show progress bar for evaluation.')
+    return parser.parse_args()
+
+
+if __name__ == '__main__':
+    import os
+    from utils.misc import load_dataset_indices, load_args, load_state
+    from augmentation.augmentations import get_normalizer
+    from datasets.datasets import get_datasets, get_base_sets
+    from models.model_factory import MODEL_GETTERS
+
+    args = parse_args()
+    args.device = torch.device(args.device)
+
+    # Load arguments of run to evaluate
+    run_args = load_args(args.run_path)
+
+    # Initialize test dataset and loader
+    _, test_set = get_base_sets(run_args.dataset, args.data_dir, test_transform=get_normalizer(run_args.dataset))
+    test_loader = DataLoader(
+        test_set,
+        batch_size=run_args.batch_size,
+        num_workers=run_args.num_workers,
+        shuffle=False,
+        pin_memory=run_args.pin_memory,
+    )
+
+    # Load trained model from specified checkpoint .tar-file containing model state dict
+    run_args.num_classes = len(test_set.classes)
+    model = MODEL_GETTERS[run_args.model](num_classes=run_args.num_classes)
+
+    if args.checkpoint_file:
+        saved_state = load_state(os.path.join(args.run_path, args.checkpoint_file), map_location=args.device)
+    else:
+        checkpoint_file = next(filter(lambda x: x.endswith('.tar'), sorted(os.listdir(args.run_path), reverse=True)))
+        saved_state = load_state(os.path.join(args.run_path, checkpoint_file), map_location=args.device)
+
+    model.load_state_dict(saved_state['model_state_dict'])
+    eval_metrics = evaluate(run_args, test_loader, model, saved_state['epoch'])
+
+    print(' FixMatch EVALUATION '.center(50, '-'))
+    print(f'\t - Dataset {run_args.dataset}')
+    print(f'\t - Model {run_args.model}')
+    print(f'\t - Test metrics:')
+    for name, value in eval_metrics._asdict().items():
+        print(f'\t\t{name}: {value}')

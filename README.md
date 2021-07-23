@@ -22,9 +22,9 @@ conda install --file requirements.txt
 ```
 
 ## Training
-FixMatch training is started by running the following command:
+FixMatch training is started by running the following command (`--pbar` to show progress bar during training):
 ```
-python main.py
+python main.py --pbar
 ```
 All commandline arguments, which can be used to adapt the configuration of FixMatch are defined and described in `arguments.py`.
 By default the following configuration is run:
@@ -67,7 +67,12 @@ tensorboard --logdir <result_folder>
 This starts a tensorboard instance at `localhost:6006`, which can be opened in any common browser.
 
 ## Evaluation
-
+A trained FixMatch model can be evaluated by running:
+```
+ python3 eval.py --run-path out/fixmatch_training/run_0 --pbar --device <cuda / cpu>
+```
+where `--run-path` specifies the path at which the run to be evaluated is saved. Alternatively, one can also check all 
+metrics over all epochs using the tensorboard file.
 
 ## References
 ```
