@@ -123,4 +123,3 @@ def load_state(path: str, map_location=None):
 def load_args(run_path):
     run_args = json.load(open(os.path.join(run_path, "args.json")))
     return SimpleNamespace(**run_args)
-
