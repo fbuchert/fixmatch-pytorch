@@ -1,5 +1,5 @@
 # PyTorch Implementation: FixMatch
-![License](https://img.shields.io/github/license/fbuchert/fixmatch-pytorch)
+![License](https://img.shields.io/github/license/fbuchert/fixmatch-pytorch?label=license)
 
 PyTorch implementation of [FixMatch: Simplifying Semi-Supervised Learning with Consistency and Confidence
 ](https://arxiv.org/abs/2001.07685) based on the [official tensorflow implementation](https://github.com/google-research/fixmatch).
